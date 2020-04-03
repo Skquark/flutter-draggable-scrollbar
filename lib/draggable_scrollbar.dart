@@ -49,6 +49,9 @@ class DraggableScrollbar extends StatefulWidget {
   /// Determines scrollThumb displaying. If you draw own ScrollThumb and it is true you just don't need to use animation parameters in [scrollThumbBuilder]
   final bool alwaysVisibleScrollThumb;
   
+  /// The ScrollController for the BoxScrollView
+  final ScrollController controller;
+  
   /// Listens to hardware keyboard to allow control of down, up, space, page down, page up
   final bool keyboardSupport;
 
@@ -65,6 +68,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
+    this.keyboardSupport = false,
   })  : assert(controller != null),
         assert(scrollThumbBuilder != null),
         super(key: key);
@@ -82,6 +86,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
+    this.keyboardSupport = false,
   })  : scrollThumbBuilder =
             _thumbRRectBuilder(scrollThumbKey, alwaysVisibleScrollThumb),
         super(key: key);
@@ -99,6 +104,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
+    this.keyboardSupport = false,
   })  : scrollThumbBuilder =
             _thumbArrowBuilder(scrollThumbKey, alwaysVisibleScrollThumb),
         super(key: key);
@@ -116,6 +122,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
+    this.keyboardSupport = false,
   })  : scrollThumbBuilder = _thumbSemicircleBuilder(
             heightScrollThumb * 0.6, scrollThumbKey, alwaysVisibleScrollThumb),
         super(key: key);
