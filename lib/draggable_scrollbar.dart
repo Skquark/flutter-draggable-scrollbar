@@ -322,6 +322,7 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
   AnimationController _labelAnimationController;
   Animation<double> _labelAnimation;
   Timer _fadeoutTimer;
+  FocusNode _keyboardFocus;
 
   @override
   void initState() {
@@ -349,6 +350,8 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
       parent: _labelAnimationController,
       curve: Curves.fastOutSlowIn,
     );
+    if (widget.keyboardSupport)
+      _keyboardFocus = FocusNode();
   }
   
   WidgetsBinding.instance.addPostFrameCallback((_) =>
@@ -366,6 +369,7 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
     _fadeoutTimer?.cancel();
     _labelAnimationController.dispose();
     _thumbAnimationController.dispose();
+    _keyboardFocus?.dispose();
     super.dispose();
   }
 
@@ -398,7 +402,14 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
         child: Stack(
           children: <Widget>[
             RepaintBoundary(
-              child: widget.child,
+              child: (widget.keyboardSupport)
+              ? RawKeyboardListener(
+                focusNode: _keyboardFocus,
+                autofocus: true,
+                onKey: _handleKeyboard,
+                child: widget.child),
+              )
+              : widget.child,
             ),
             RepaintBoundary(
                 child: GestureDetector(
@@ -536,6 +547,34 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
     setState(() {
       _isDragInProcess = false;
     });
+  }
+    
+  void _handleKeyboard(RawKeyEvent keyEvent) {
+    if(keyEvent.runtimeType == RawKeyDownEvent) {
+      double offset = widget.controller.offset;
+      double position = offset;
+      //print("Pressed Key: " + keyEvent.logicalKey.keyId.toString() + " " + keyEvent.logicalKey.debugName + " offset:" + widget.controller.offset.toString() + " position:" + extent.toString());
+      switch (keyEvent.logicalKey.debugName) {
+        case "Arrow Down":
+          position = offset + 30.0;
+          break;
+        case "Arrow Up":
+          position = offset - 30.0;
+          break;
+        case "Space":
+        case "Page Down":
+          position = offset + 100.0;
+          break;
+        case "Page Up":
+          position = offset - 100.0;
+          break;
+        default:
+      }
+      if(position < viewMinScrollExtent) position = viewMinScrollExtent;
+      if(position >= viewMaxScrollExtent) position = viewMaxScrollExtent;
+      //print("animateTo: $position");
+      widget.controller.animateTo(position, duration: Duration(milliseconds: 200), curve: Curves.ease);
+    }
   }
 }
 
