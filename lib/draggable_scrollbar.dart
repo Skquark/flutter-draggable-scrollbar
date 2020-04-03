@@ -20,7 +20,7 @@ typedef Text LabelTextBuilder(double offsetY);
 /// for quick navigation of the BoxScrollView.
 class DraggableScrollbar extends StatefulWidget {
   /// The view that will be scrolled with the scroll thumb
-  final BoxScrollView child;
+  final Widget child;
 
   /// A function that builds a thumb using the current configuration
   final ScrollThumbBuilder scrollThumbBuilder;
@@ -46,11 +46,11 @@ class DraggableScrollbar extends StatefulWidget {
   /// Determines box constraints for Container displaying label
   final BoxConstraints labelConstraints;
 
-  /// The ScrollController for the BoxScrollView
-  final ScrollController controller;
-
   /// Determines scrollThumb displaying. If you draw own ScrollThumb and it is true you just don't need to use animation parameters in [scrollThumbBuilder]
   final bool alwaysVisibleScrollThumb;
+  
+  /// Listens to hardware keyboard to allow control of down, up, space, page down, page up
+  final bool keyboardSupport;
 
   DraggableScrollbar({
     Key key,
@@ -67,7 +67,6 @@ class DraggableScrollbar extends StatefulWidget {
     this.labelConstraints,
   })  : assert(controller != null),
         assert(scrollThumbBuilder != null),
-        assert(child.scrollDirection == Axis.vertical),
         super(key: key);
 
   DraggableScrollbar.rrect({
@@ -83,8 +82,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
-  })  : assert(child.scrollDirection == Axis.vertical),
-        scrollThumbBuilder =
+  })  : scrollThumbBuilder =
             _thumbRRectBuilder(scrollThumbKey, alwaysVisibleScrollThumb),
         super(key: key);
 
@@ -101,8 +99,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
-  })  : assert(child.scrollDirection == Axis.vertical),
-        scrollThumbBuilder =
+  })  : scrollThumbBuilder =
             _thumbArrowBuilder(scrollThumbKey, alwaysVisibleScrollThumb),
         super(key: key);
 
@@ -119,8 +116,7 @@ class DraggableScrollbar extends StatefulWidget {
     this.scrollbarTimeToFade = const Duration(milliseconds: 600),
     this.labelTextBuilder,
     this.labelConstraints,
-  })  : assert(child.scrollDirection == Axis.vertical),
-        scrollThumbBuilder = _thumbSemicircleBuilder(
+  })  : scrollThumbBuilder = _thumbSemicircleBuilder(
             heightScrollThumb * 0.6, scrollThumbKey, alwaysVisibleScrollThumb),
         super(key: key);
 
@@ -347,11 +343,22 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
       curve: Curves.fastOutSlowIn,
     );
   }
+  
+  WidgetsBinding.instance.addPostFrameCallback((_) =>
+        _initOffsetForScrollInitialOffset());
+  }
+
+  /// init offset when widgets finish loading
+  void _initOffsetForScrollInitialOffset() {
+    _viewOffset = widget.controller.initialScrollOffset;
+    _barOffset = _viewOffset / viewMaxScrollExtent * barMaxScrollExtent;
+    setState(() {});
 
   @override
   void dispose() {
-    _thumbAnimationController.dispose();
     _fadeoutTimer?.cancel();
+    _labelAnimationController.dispose();
+    _thumbAnimationController.dispose();
     super.dispose();
   }
 
