@@ -551,9 +551,9 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
     
   void _handleKeyboard(RawKeyEvent keyEvent) {
     if(keyEvent.runtimeType == RawKeyDownEvent) {
-      double offset = widget.controller.offset;
+      double offset = widget.controller.position.pixels;
       double position = offset;
-      //print("Pressed Key: " + keyEvent.logicalKey.keyId.toString() + " " + keyEvent.logicalKey.debugName + " offset:" + widget.controller.offset.toString() + " position:" + extent.toString());
+      //print("Pressed Key: " + keyEvent.logicalKey.keyId.toString() + " " + keyEvent.logicalKey.debugName + " offset:" + widget.controller.position.pixels.toString() + " position:" + extent.toString());
       switch (keyEvent.logicalKey.debugName) {
         case "Arrow Down":
           position = offset + 30.0;
@@ -563,10 +563,10 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
           break;
         case "Space":
         case "Page Down":
-          position = offset + 100.0;
+          position = offset + barMaxScrollExtent;
           break;
         case "Page Up":
-          position = offset - 100.0;
+          position = offset - barMaxScrollExtent;
           break;
         default:
       }
