@@ -353,17 +353,17 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
     if (widget.keyboardSupport)
       _keyboardFocus = FocusNode();
   }
-  
+  /*
   WidgetsBinding.instance.addPostFrameCallback((_) =>
         _initOffsetForScrollInitialOffset());
-  }
+  
 
   /// init offset when widgets finish loading
   void _initOffsetForScrollInitialOffset() {
     _viewOffset = widget.controller.initialScrollOffset;
     _barOffset = _viewOffset / viewMaxScrollExtent * barMaxScrollExtent;
     setState(() {});
-
+*/
   @override
   void dispose() {
     _fadeoutTimer?.cancel();
@@ -407,7 +407,7 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
                 focusNode: _keyboardFocus,
                 autofocus: true,
                 onKey: _handleKeyboard,
-                child: widget.child),
+                child: widget.child
               )
               : widget.child,
             ),
@@ -550,10 +550,10 @@ class _DraggableScrollbarState extends State<DraggableScrollbar>
   }
     
   void _handleKeyboard(RawKeyEvent keyEvent) {
-    if(keyEvent.runtimeType == RawKeyDownEvent) {
+    if(keyEvent.runtimeType == RawKeyEvent) {
       double offset = widget.controller.position.pixels;
       double position = offset;
-      //print("Pressed Key: " + keyEvent.logicalKey.keyId.toString() + " " + keyEvent.logicalKey.debugName + " offset:" + widget.controller.position.pixels.toString() + " position:" + extent.toString());
+      print("Pressed Key: " + keyEvent.logicalKey.keyId.toString() + " " + keyEvent.logicalKey.debugName + " offset:" + widget.controller.position.pixels.toString());
       switch (keyEvent.logicalKey.debugName) {
         case "Arrow Down":
           position = offset + 30.0;
